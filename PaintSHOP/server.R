@@ -3,14 +3,15 @@
 # July 15, 2019
 
 library(shiny)
+library(dplyr)
 library(tidyverse)
 library(vroom)
 library(fuzzyjoin)
 library(Biostrings)
-library(aws.s3)
+#library(aws.s3)
 
 # source AWS credentials to access probes
-source("aws-credentials.R")
+#source("aws-credentials.R")
 
 # load appending functions
 source("helpers.R")
@@ -78,16 +79,17 @@ shinyServer(function(input, output, session) {
     return(intersect_result)
   })
   
+  
   # filter intersect based on the currently selected advanced settings
   probe_intersect_filter <- reactive({
     if(input$repeat_seq) {
       probe_intersect() %>%
-        filter(off_target <= input$off_target,
+        dplyr::filter(off_target == input$off_target,
                max_kmer <= input$max_kmer,
                prob >= input$min_prob)
     } else {
       probe_intersect() %>%
-        filter(repeat_seq != 1,
+        dplyr::filter(input$repeat_seq != 1,
                off_target <= input$off_target,
                max_kmer <= input$max_kmer,
                prob >= input$min_prob)
@@ -109,18 +111,18 @@ shinyServer(function(input, output, session) {
     if(input$balance_set == 2) {
       probes_greater_or_eq <- probe_intersect_filter() %>%
         group_by(refseq) %>%
-        filter(n() >= input$balance_goal) %>%
+        dplyr::filter(n() >= input$balance_goal) %>%
         arrange(off_target, .by_group = TRUE) %>%
         dplyr::slice(1:input$balance_goal)
       
       probes_less <- probe_intersect_filter() %>%
         group_by(refseq) %>%
-        filter(n() < input$balance_goal) 
+        dplyr::filter(n() < input$balance_goal) 
       
       targets_less <- unique(probes_less$refseq)
       
       probes_add_back <- probe_intersect() %>%
-        filter(refseq %in% targets_less) %>%
+        dplyr::filter(refseq %in% targets_less) %>%
         group_by(refseq) %>%
         arrange(off_target, .by_group = TRUE) %>%
         dplyr::slice(1:input$balance_goal)
@@ -129,13 +131,13 @@ shinyServer(function(input, output, session) {
     } else if(input$balance_set == 1) {
       probes_greater_or_eq <- probe_intersect_filter() %>%
         group_by(refseq) %>%
-        filter(n() >= input$balance_goal) %>%
+        dplyr::filter(n() >= input$balance_goal) %>%
         arrange(off_target, .by_group = TRUE) %>%
         dplyr::slice(1:input$balance_goal)
       
       probes_less <- probe_intersect_filter() %>%
         group_by(refseq) %>%
-        filter(n() < input$balance_goal) 
+        dplyr::filter(n() < input$balance_goal) 
       
       bind_rows(probes_greater_or_eq, probes_less)
       
@@ -188,6 +190,7 @@ shinyServer(function(input, output, session) {
       
       coords <- lapply(coord_split, function(x) unlist(strsplit(x, ":"))[2])
       
+      
       start <- lapply(coords, function(x) unlist(strsplit(x, "-"))[1])
       stop <- lapply(coords, function(x) unlist(strsplit(x, "-"))[2])
       strand <- lapply(coord_split, function(x) unlist(strsplit(x, ":"))[3])
@@ -200,7 +203,6 @@ shinyServer(function(input, output, session) {
       # convert start stop to integers
       coord_df$start <- as.numeric(coord_df$start)
       coord_df$stop <- as.numeric(coord_df$stop)
-      
       coord_df
     } else {
       # error handling for user file upload
@@ -217,45 +219,45 @@ shinyServer(function(input, output, session) {
                              "strand"))        
     }
   })
-  
   # for each chromosome:
   # 1. load in the chromosome probe file for the specified genome assembly
   # 2. do intersection with coordinates for that chromosome
+  
   coord_intersect <- eventReactive(input$coord_submit, {
     # retrieve the unique chromosome from the coordinates provided by user
+
     unique_chroms <- unique(coordinates()$chrom)
-    
     coord_intersect_results <- list()
-    
+
     # loop over each chromosome, doing probe intersect iteratively
     for (i in 1:length(unique_chroms)) {
       # first retrieve the user coordinates for current chromosome
       chrom_coords <- coordinates() %>%
-        filter(chrom == unique_chroms[i])
-      
+        dplyr::filter(chrom == unique_chroms[i])
+
       # create the name of the chromosome file to read in
       chrom_path <- paste(input$probeset_coord, "_", unique_chroms[i], ".tsv", sep = "")
+
       
       # read in the chromosome probe file to intersect with from AWS S3
-      chrom_probes <- s3read_using(read_probes_chrom,
-                                   object = chrom_path,
-                                   bucket = "paintshop-bucket")
-      
+      chrom_probes <- read.table(file = chrom_path, sep = '\t', col.names=c("chrom", "start", "stop","sequence","Tm","on_target","off_target","repeat_seq","prob","max_kmer","probe_strand"))
+      #chrom_probes <- s3read_using(read_probes_chrom,
+      #                             object = chrom_path,
+      #                             bucket = "paintshop-bucket")
       # do the intersect for the chromosome, storing result in list
       coord_intersect_results[[i]] <- fuzzyjoin::genome_join(chrom_probes, chrom_coords,
                                                              by = c("chrom", "start", "stop"),
                                                              mode = "inner",
                                                              type = "within")
     }
-    
     # explicitly remove the last chromosome probe file to free up RAM
     rm(chrom_probes)
     
     # create a data frame from the list of results
     intersect <- bind_rows(coord_intersect_results)
-    
     # iterate over the result of the intersect,
     # taking the reverse complement if user specified "-"
+    print(intersect)
     for (i in 1:nrow(intersect)) {
       # the BED strand from the user must both not be NA and must be "-" to flip sequence
       if(!is.na(intersect$strand[i]) & intersect$strand[i] == "-") {
@@ -263,13 +265,15 @@ shinyServer(function(input, output, session) {
         intersect$probe_strand[i] = "-"
       }
     }
-    
+
     # return the result of intersect with probes in specified orientation
     intersect
+    
   })
-  
+
   # filter intersect based on the currently selected advanced settings
   coord_intersect_filter <- reactive({
+    
     if(input$repeat_seq_coord) {
       coord_intersect() %>%
         filter(off_target <= input$off_target_coord,
@@ -277,13 +281,14 @@ shinyServer(function(input, output, session) {
                prob >= input$min_prob_coord)
     } else {
       coord_intersect() %>%
-        filter(repeat_seq != 1,
+        dplyr::filter(repeat_seq != 1,
                off_target <= input$off_target_coord,
                max_kmer <= input$max_kmer_coord,
                prob >= input$min_prob_coord)
     }
   })
-  
+  print(coord_intersect_filter)
+  print("Coordinate-Based, Filtered Intersection")
   # code for balancing probe set
   observeEvent(input$coord_balance_show, {
     if(input$coord_balance_show) {
@@ -300,20 +305,20 @@ shinyServer(function(input, output, session) {
       probes_greater_or_eq <- coord_intersect_filter() %>%
         group_by(chrom.y, start.y) %>%
         mutate(target = str_c(chrom.y, "_", start.y, "-", stop.y)) %>%
-        filter(n() >= input$coord_balance_goal) %>%
+        dplyr::filter(n() >= input$coord_balance_goal) %>%
         arrange(off_target, .by_group = TRUE) %>%
         dplyr::slice(1:input$coord_balance_goal)
       
       probes_less <- coord_intersect_filter() %>%
         group_by(chrom.y, start.y) %>%
-        filter(n() < input$coord_balance_goal) %>%
+        dplyr::filter(n() < input$coord_balance_goal) %>%
         mutate(target = str_c(chrom.y, "_", start.y, "-", stop.y))
       
       targets_less <- unique(probes_less$target)
       
       probes_add_back <- coord_intersect() %>%
         mutate(target = str_c(chrom.y, "_", start.y, "-", stop.y)) %>%
-        filter(target %in% targets_less) %>%
+        dplyr::filter(target %in% targets_less) %>%
         group_by(chrom.y, start.y) %>%
         arrange(off_target, .by_group = TRUE) %>%
         dplyr::slice(1:input$coord_balance_goal)
@@ -329,13 +334,13 @@ shinyServer(function(input, output, session) {
       probes_greater_or_eq <- coord_intersect_filter() %>%
         group_by(chrom.y, start.y) %>%
         mutate(target = str_c(chrom.y, "_", start.y, "-", stop.y)) %>%
-        filter(n() >= input$coord_balance_goal) %>%
+        dplyr::filter(n() >= input$coord_balance_goal) %>%
         arrange(off_target, .by_group = TRUE) %>%
         dplyr::slice(1:input$coord_balance_goal)
       
       probes_less <- coord_intersect_filter() %>%
         group_by(chrom.y, start.y) %>%
-        filter(n() < input$coord_balance_goal) %>%
+        dplyr::filter(n() < input$coord_balance_goal) %>%
         mutate(target = str_c(chrom.y, "_", start.y, "-", stop.y))
       
       bind_rows(probes_greater_or_eq, probes_less) %>%

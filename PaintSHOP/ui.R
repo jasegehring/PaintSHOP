@@ -8,6 +8,7 @@ library(shinyjs)
 library(magrittr)
 library(shinycssloaders)
 library(shinyBS)
+library(dplyr)
 
 # Define UI for application
 shinyUI(fluidPage(
@@ -54,6 +55,7 @@ shinyUI(fluidPage(
         sidebarLayout(
           sidebarPanel(
             selectInput("probeset", "Choose Probe Set:", c(
+              "Chlamydomonas reinhardtii" = "~/Downloads/PaintSHOP_pipeline/example_run/pipeline_output/03_output_files/01_dna_probes/Chlamydomonas_reinhardtii_all_newBalance.tsv",
               "hg38 newBalance" = "v1.2/probes/refseq/hg38_refseq_newBalance.tsv",
               "hg19 newBalance" = "v1.2/probes/refseq/hg19_refseq_newBalance.tsv",
               "mm10 newBalance" = "v1.2/probes/refseq/mm10_refseq_newBalance.tsv",
@@ -173,7 +175,8 @@ shinyUI(fluidPage(
          sidebarPanel(
            # change button values to path to complete newBalance probe set, not intersect
            selectInput("probeset_coord", "Choose Probe Set:",
-                       c("hg38 newBalance" = "v1.2/probes/all/hg38_all_newBalance",
+                       c("Chlamydomonas reinhardtii" = "~/Downloads/PaintSHOP_pipeline/example_run/pipeline_output/03_output_files/01_dna_probes/Chlamydomonas_reinhardtii_all_newBalance",
+                         "hg38 newBalance" = "v1.2/probes/all/hg38_all_newBalance",
                          "hg19 newBalance" = "v1.2/probes/all/hg19_all_newBalance",
                          "mm10 newBalance" = "v1.2/probes/all/mm10_all_newBalance",
                          "mm9 newBalance" = "v1.2/probes/all/mm9_all_newBalance",
@@ -190,7 +193,7 @@ shinyUI(fluidPage(
                          "2012 Oligopaints hg19" = "v1.2/probes/all/hg19_2012_all",
                          "iFISH4U 40-mer hg19" = "v1.2/probes/all/iFISH4U_all")),
            textInput("coord_manual", label = h3("Enter genomic coordinates manually "), 
-                     value = "chr10:26216307-26304562, chr12:111034165-111350554, chr3:62369681-62373550"),
+                     value = "chromosome_4:2000-4000:+, chromosome_4:5000-6000:+"),
            tags$p("(Please enter chr:start-stop for each target. Optionally, you can specify which strand",
                   " to return, by entering chr:start-stop:+ or chr:start-stop:- for a target.)"),
            tags$h3("OR"),
