@@ -55,7 +55,6 @@ shinyUI(fluidPage(
         sidebarLayout(
           sidebarPanel(
             selectInput("probeset", "Choose Probe Set:", c(
-              "Chlamydomonas reinhardtii" = "~/Downloads/PaintSHOP_pipeline/example_run/pipeline_output/03_output_files/01_dna_probes/Chlamydomonas_reinhardtii_all_newBalance.tsv",
               "Custom Probeset All newBalance" = "/home/rstudio/../../content/all_newBalance.tsv",
               "Custom Probeset Iso newBalance" = "/home/rstudio/../../content/iso_newBalance.tsv",
               "Custom Probeset RefSeq newBalance" = "/home/rstudio/../../content/refseq_newBalance.tsv",
