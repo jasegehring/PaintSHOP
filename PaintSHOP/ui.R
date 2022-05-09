@@ -177,7 +177,7 @@ shinyUI(fluidPage(
          sidebarPanel(
            # change button values to path to complete newBalance probe set, not intersect
            selectInput("probeset_coord", "Choose Probe Set:",
-                       c("Custom Probeset All newBalance" = "/home/rstudio/../../content/01_dna_probes_all/Custom_all_newBalance",
+                       c("Custom Probeset All newBalance" = "/home/rstudio/../../content/01_dna_probes/Custom_all_newBalance",
                          "hg38 newBalance" = "v1.2/probes/all/hg38_all_newBalance",
                          "hg19 newBalance" = "v1.2/probes/all/hg19_all_newBalance",
                          "mm10 newBalance" = "v1.2/probes/all/mm10_all_newBalance",
