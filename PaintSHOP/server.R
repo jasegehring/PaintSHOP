@@ -7,7 +7,10 @@ library(dplyr)
 library(tidyverse)
 library(vroom)
 library(fuzzyjoin)
-library(Biostrings)
+if (!require("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+
+BiocManager::install("Biostrings")
 #library(aws.s3)
 
 # source AWS credentials to access probes
