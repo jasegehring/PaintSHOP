@@ -55,8 +55,9 @@ shinyUI(fluidPage(
         sidebarLayout(
           sidebarPanel(
             selectInput("probeset", "Choose Probe Set:", c(
-              "Chlamydomonas reinhardtii" = "~/Downloads/PaintSHOP_pipeline/example_run/pipeline_output/03_output_files/01_dna_probes/Chlamydomonas_reinhardtii_all_newBalance.tsv",
-              "hg38 newBalance" = "v1.2/probes/refseq/hg38_refseq_newBalance.tsv",
+              "Custom Probeset All newBalance" = "/home/rstudio/../../content/all_newBalance.tsv",
+              "Custom Probeset Iso newBalance" = "/home/rstudio/../../content/iso_newBalance.tsv",
+              "Custom Probeset RefSeq newBalance" = "/home/rstudio/../../content/refseq_newBalance.tsv","hg38 newBalance" = "v1.2/probes/refseq/hg38_refseq_newBalance.tsv",
               "hg19 newBalance" = "v1.2/probes/refseq/hg19_refseq_newBalance.tsv",
               "mm10 newBalance" = "v1.2/probes/refseq/mm10_refseq_newBalance.tsv",
               "mm9 newBalance" = "v1.2/probes/refseq/mm9_refseq_newBalance.tsv",
@@ -175,7 +176,9 @@ shinyUI(fluidPage(
          sidebarPanel(
            # change button values to path to complete newBalance probe set, not intersect
            selectInput("probeset_coord", "Choose Probe Set:",
-                       c("Chlamydomonas reinhardtii" = "~/Downloads/PaintSHOP_pipeline/example_run/pipeline_output/03_output_files/01_dna_probes/Chlamydomonas_reinhardtii_all_newBalance",
+                       c("Custom Probeset All newBalance" = "/home/rstudio/../../content/all_newBalance.tsv",
+                         "Custom Probeset Iso newBalance" = "/home/rstudio/../../content/iso_newBalance.tsv",
+                         "Custom Probeset RefSeq newBalance" = "/home/rstudio/../../content/refseq_newBalance.tsv",
                          "hg38 newBalance" = "v1.2/probes/all/hg38_all_newBalance",
                          "hg19 newBalance" = "v1.2/probes/all/hg19_all_newBalance",
                          "mm10 newBalance" = "v1.2/probes/all/mm10_all_newBalance",
