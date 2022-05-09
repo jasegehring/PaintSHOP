@@ -6,7 +6,9 @@ library(shiny)
 library(tidyverse)
 library(vroom)
 library(fuzzyjoin)
-install.packages("BiocManager")
+if (!require("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+
 BiocManager::install("Biostrings")
 library(aws.s3)
 
