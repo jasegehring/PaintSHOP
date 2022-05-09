@@ -55,9 +55,10 @@ shinyUI(fluidPage(
         sidebarLayout(
           sidebarPanel(
             selectInput("probeset", "Choose Probe Set:", c(
-              "Custom Probeset All newBalance" = "/home/rstudio/../../content/all_newBalance.tsv",
-              "Custom Probeset Iso newBalance" = "/home/rstudio/../../content/iso_newBalance.tsv",
-              "Custom Probeset RefSeq newBalance" = "/home/rstudio/../../content/refseq_newBalance.tsv","hg38 newBalance" = "v1.2/probes/refseq/hg38_refseq_newBalance.tsv",
+              "Custom Probeset All newBalance" = "/home/rstudio/../../content/02_rna_probes_all/Custom_all_newBalance.tsv",
+              "Custom Probeset Iso newBalance" = "/home/rstudio/../../content/03_rna_probes_iso/Custom_iso_newBalance.tsv",
+              "Custom Probeset RefSeq newBalance" = "/home/rstudio/../../content/refseq_newBalance.tsv",
+              "hg38 newBalance" = "v1.2/probes/refseq/hg38_refseq_newBalance.tsv",
               "hg19 newBalance" = "v1.2/probes/refseq/hg19_refseq_newBalance.tsv",
               "mm10 newBalance" = "v1.2/probes/refseq/mm10_refseq_newBalance.tsv",
               "mm9 newBalance" = "v1.2/probes/refseq/mm9_refseq_newBalance.tsv",
@@ -176,9 +177,7 @@ shinyUI(fluidPage(
          sidebarPanel(
            # change button values to path to complete newBalance probe set, not intersect
            selectInput("probeset_coord", "Choose Probe Set:",
-                       c("Custom Probeset All newBalance" = "/home/rstudio/../../content/all_newBalance.tsv",
-                         "Custom Probeset Iso newBalance" = "/home/rstudio/../../content/iso_newBalance.tsv",
-                         "Custom Probeset RefSeq newBalance" = "/home/rstudio/../../content/refseq_newBalance.tsv",
+                       c("Custom Probeset All newBalance" = "/home/rstudio/../../content/01_dna_probes_all/Custom_all_newBalance",
                          "hg38 newBalance" = "v1.2/probes/all/hg38_all_newBalance",
                          "hg19 newBalance" = "v1.2/probes/all/hg19_all_newBalance",
                          "mm10 newBalance" = "v1.2/probes/all/mm10_all_newBalance",
