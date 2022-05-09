@@ -6,10 +6,10 @@ library(shiny)
 library(dplyr)
 library(tidyverse)
 library(vroom)
-library(fuzzyjoin)
 if (!require("BiocManager", quietly = TRUE))
     install.packages("BiocManager")
-
+install.packages("fuzzyjoin")
+library(fuzzyjoin)
 BiocManager::install("Biostrings")
 #library(aws.s3)
 
