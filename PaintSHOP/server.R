@@ -6,11 +6,12 @@ library(shiny)
 library(dplyr)
 library(tidyverse)
 library(vroom)
-if (!require("BiocManager", quietly = TRUE))
-    install.packages("BiocManager")
+source("http://bioconductor.org/biocLite.R")
+biocLite("Biostrings")
+require(Biostrings)
 install.packages("fuzzyjoin")
 library(fuzzyjoin)
-BiocManager::install("Biostrings")
+
 #library(aws.s3)
 
 # source AWS credentials to access probes
